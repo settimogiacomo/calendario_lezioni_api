@@ -1,3 +1,5 @@
+import './costanti.js'
+
 const express = require('express');
 const cors = require('cors');
 const mysql = require('mysql')
@@ -5,15 +7,15 @@ const bodyParser = require('body-parser')
 const app = express();
 const port = 3005;
 const conn = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: 'root',
-    database: 'calendario_lezioni'
+    host: HOST,
+    user: USER,
+    password: USER,
+    database: NOME_DB
 })
 
 
 
-    conn.connect()
+conn.connect()
 app.use(cors({
     origin: '*' //'http://localhost:XXXX' indirizzo flutter
 }));
