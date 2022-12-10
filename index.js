@@ -10,7 +10,7 @@ const port = 3005;
 const conn = mysql.createConnection({
     host: HOST,
     user: USER,
-    password: USER,
+    password: PASS,
     database: NOME_DB
 })
 
@@ -56,6 +56,42 @@ app.post('/check-login',(req,res) => {
     }
     
     console.log("POST check-login")
+    res.status(200);
+    
+})
+
+
+app.get('/get-lezioni',(req,res) => {
+    var body = req.body
+
+    try{
+        conn.query('SELECT * FROM lista_lezioni', (err, rows, fields) => {
+            //if (err) throw err
+            if (err){
+                res.json({ isTable: 'false' })
+            } else {
+               
+                if(rows.length >= 1){
+                    var result = [];
+                        for (let i=0;i<rows.length;i++) {
+                            result.push({id_lezione: rows[i].id_lezione, id_insegnante: rows[i].id_insegnante, id_studente: rows[i].id_studente,inizio_lezione: rows[i].inizio_lezione,fine_lezione: rows[i].fine_lezione,stato: rows[i].stato});
+                        
+                        }
+                        console.log(result)
+                        res.json({isTable:'True', data:result })
+                        
+                } else {
+                    res.json({ isTable: 'false' })
+                }
+                
+            }
+            
+        })
+    } catch(errore) {
+        res.json ({isTable:'false', debug:errore})
+    }
+    
+    console.log("GET get-lezioni")
     res.status(200);
     
 })
