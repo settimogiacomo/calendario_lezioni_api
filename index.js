@@ -1,4 +1,5 @@
-import './costanti.js'
+
+require('./costanti.js')();
 
 const express = require('express');
 const cors = require('cors');
@@ -17,7 +18,7 @@ const conn = mysql.createConnection({
 
 conn.connect()
 app.use(cors({
-    origin: '*' //'http://localhost:XXXX' indirizzo flutter
+    origin: '*' //'http://localhost' indirizzo flutter
 }));
 
 //the encoding of the request (post) Contet-Type: application/json
