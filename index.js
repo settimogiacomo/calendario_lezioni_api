@@ -1,10 +1,11 @@
 
-require('./costanti.js')();
+require('./costanti.js')()
 
-const express = require('express');
-const cors = require('cors');
+const express = require('express')
+const cors = require('cors')
 const mysql = require('mysql')
 const bodyParser = require('body-parser')
+const moment = require('moment')
 const app = express();
 const port = 3005;
 const conn = mysql.createConnection({
@@ -65,7 +66,7 @@ app.get('/get-lezioni',(req,res) => {
     var body = req.body
 
     try{
-        conn.query('SELECT * FROM lista_lezioni', (err, rows, fields) => {
+        conn.query('SELECT * FROM lista_lezioni_vista', (err, rows, fields) => {
             //if (err) throw err
             if (err){
                 res.json({ isTable: 'false' })
@@ -74,11 +75,18 @@ app.get('/get-lezioni',(req,res) => {
                 if(rows.length >= 1){
                     var result = [];
                         for (let i=0;i<rows.length;i++) {
-                            result.push({id_lezione: rows[i].id_lezione, id_insegnante: rows[i].id_insegnante, id_studente: rows[i].id_studente,inizio_lezione: rows[i].inizio_lezione,fine_lezione: rows[i].fine_lezione,stato: rows[i].stato});
-                        
+                            //parsing datetime
+                            console.log(rows[i].inizio_lezione)
+                            console.log(rows[i].fine_lezione)
+
+                            moment.locale('it')
+                            let inizioLezione = moment(rows[i].inizio_lezione).utcOffset(60).format('DD/MM/YYYY, hh:mm A') 
+                            let fineLezione = moment(rows[i].fine_lezione).utcOffset(60).format('DD/MM/YYYY, hh:mm A')
+
+                            result.push({ id_lezione: rows[i].id_lezione, id_insegnante: rows[i].id_insegnante, insegnante: rows[i].insegnante, materia: rows[i].materia, id_studente: rows[i].id_studente, username: rows[i].username, inizio_lezione: inizioLezione, fine_lezione: fineLezione, stato: rows[i].stato})
                         }
                         console.log(result)
-                        res.json({isTable:'True', data:result })
+                        res.json({isTable:'true', data:result })
                         
                 } else {
                     res.json({ isTable: 'false' })
