@@ -107,7 +107,7 @@ app.get('/get-lezioni',(req,res) => {
 app.get('/lezione/:materia',(req,res) => {
 
     try{
-        conn.query('SELECT * FROM calendario_settimana1 WHERE materia = "' + req.params.materia + '" AND stato =  "0"', (err, rows, fields) => {
+        conn.query('SELECT cs.id_giorno, cs.id_insegnante, im.insegnante, cs.materia, cs.inizio_lezione, cs.fine_lezione, cs.stato FROM calendario_settimana cs JOIN insegnante_materia im ON (im.id_insegnante = cs.id_insegnante) WHERE cs.materia = "' + req.params.materia + '" AND cs.stato =  "0"', (err, rows, fields) => {
             //if (err) throw err
             if (err){
                 res.json({ isTable: 'false' })
@@ -126,7 +126,7 @@ app.get('/lezione/:materia',(req,res) => {
                             //let inizioLezione = moment(rows[i].inizio_lezione).utcOffset(60).format('DD/MM/YYYY, hh:mm A') 
                             //let fineLezione = moment(rows[i].fine_lezione).utcOffset(60).format('DD/MM/YYYY, hh:mm A')
 
-                            result.push({ id_giorno: rows[i].id_giorno, id_insegnante: rows[i].id_insegnante, materia: rows[i].materia, inizio_lezione: rows[i].inizio_lezione, fine_lezione: rows[i].fine_lezione, stato: rows[i].stato})
+                            result.push({ id_giorno: rows[i].id_giorno, id_insegnante: rows[i].id_insegnante, insegnante: rows[i].insegnante, materia: rows[i].materia, inizio_lezione: rows[i].inizio_lezione, fine_lezione: rows[i].fine_lezione, stato: rows[i].stato})
                         }
                         console.log(result)
                         res.json({isTable:'true', data:result })
