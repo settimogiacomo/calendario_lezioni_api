@@ -76,8 +76,8 @@ app.get('/get-lezioni',(req,res) => {
                     var result = [];
                         for (let i=0;i<rows.length;i++) {
                             //parsing datetime
-                            console.log(rows[i].inizio_lezione)
-                            console.log(rows[i].fine_lezione)
+                           // console.log(rows[i].inizio_lezione)
+                           // console.log(rows[i].fine_lezione)
 
                             moment.locale('it')
                             let inizioLezione = moment(rows[i].inizio_lezione).utcOffset(60).format('DD/MM/YYYY, hh:mm A') 
@@ -85,7 +85,7 @@ app.get('/get-lezioni',(req,res) => {
 
                             result.push({ id_lezione: rows[i].id_lezione, id_insegnante: rows[i].id_insegnante, insegnante: rows[i].insegnante, materia: rows[i].materia, id_studente: rows[i].id_studente, username: rows[i].username, inizio_lezione: inizioLezione, fine_lezione: fineLezione, stato: rows[i].stato})
                         }
-                        console.log(result)
+                       // console.log(result)
                         res.json({isTable:'true', data:result })
                         
                 } else {
@@ -99,7 +99,7 @@ app.get('/get-lezioni',(req,res) => {
         res.json ({isTable:'false', debug:errore})
     }
     
-    console.log("GET get-lezioni")
+ //   console.log("GET get-lezioni")
     res.status(200);
     
 })
@@ -118,6 +118,7 @@ app.get('/lezione/:materia',(req,res) => {
                         for (let i=0;i<rows.length;i++) {
                             //parsing datetime
                            // console.log(rows[i].giorno);
+                           
                             console.log(rows[i].inizio_lezione)
                             console.log(rows[i].fine_lezione)
 
@@ -125,7 +126,7 @@ app.get('/lezione/:materia',(req,res) => {
                             //let inizioLezione = moment(rows[i].inizio_lezione).utcOffset(60).format('DD/MM/YYYY, hh:mm A') 
                             //let fineLezione = moment(rows[i].fine_lezione).utcOffset(60).format('DD/MM/YYYY, hh:mm A')
 
-                            result.push({ id_giorno: rows[i].id_giorno,  inizio_lezione: rows[i].inizio_lezione, fine_lezione: rows[i].fine_lezione})
+                            result.push({ id_giorno: rows[i].id_giorno, id_insegnante: rows[i].id_insegnante, materia: rows[i].materia, inizio_lezione: rows[i].inizio_lezione, fine_lezione: rows[i].fine_lezione, stato: rows[i].stato})
                         }
                         console.log(result)
                         res.json({isTable:'true', data:result })
