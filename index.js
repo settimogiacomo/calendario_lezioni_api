@@ -41,7 +41,8 @@ app.post('/check-login',(req,res) => {
             } else {
                 if(rows.length >= 1){
                     if(body.password == rows[0].password){
-                        res.json({ isUser: 'true' })
+                        let id = rows[0].id_studente
+                        res.json({ isUser: 'true', id_studente: id })
                     } else {
                         res.json({ isUser: 'false' })
                     }
@@ -146,6 +147,34 @@ app.get('/lezione/:materia',(req,res) => {
     
 })
 
+app.post('/prenota', (req, res) => {
+    var body = req.body
+
+    let day = getGiornoLezione(body.id_giorno)
+    moment.locale('it')
+    var giorno = moment(day).utcOffset(60).format('YYYY-MM-DD') 
+
+    var query = "INSERT INTO lista_lezioni (id_insegnante, id_studente, inizio_lezione, fine_lezione, stato) VALUES ('" + body.id_insegnante + "', '" + body.id_studente + "', '" + giorno + " " + body.inizio_lezione + "', '" + giorno + " " + body.fine_lezione + "', '1')"
+  
+
+    try {
+        conn.query(query, (err, rows, fields) => {
+            //TODO: query modifica calendario_settimana
+            //if (err) throw err
+            if (err) {
+                res.json({ ok: 'false', debug: err })
+            } else {
+                res.json({ ok: 'true' })
+            }
+
+        })
+    } catch (errore) {
+        res.json({ ok: 'false', debug: errore })
+    } 
+
+
+})
+
 
 app.post('/prova-post', (req, res) => {
     console.log("POST feedback")
@@ -175,5 +204,18 @@ app.get('/select', (req, res) => {
     res.status(200)
     res.json(dati)
 })
+
 app.listen(port, () => console.log('Server in ascolto'));
+
+//TODO: spostare 
+function getGiornoLezione(giornoDellaLezione){
+    var today = new Date()
+    if (today.getDay() == 5 || today.getDay() == 6 || today.getDay() == 0){
+        today.setDate(today.getDate() + 7);
+    }
+    var domenica = today.getDate() - today.getDay()
+    let giornoLezione = domenica + giornoDellaLezione
+    let dataLezione = new Date(today.setDate(giornoLezione))
+    return dataLezione
+}
 
