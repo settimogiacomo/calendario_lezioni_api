@@ -164,7 +164,17 @@ app.post('/prenota', (req, res) => {
             if (err) {
                 res.json({ ok: 'false', debug: err })
             } else {
-                res.json({ ok: 'true' })
+              //res.json({ ok: 'true' })
+
+              var query2 = "UPDATE calendario_settimana SET stato = 1 WHERE  id_giorno = '" + body.id_giorno + "' AND id_insegnante = '" + body.id_insegnante+"' AND inizio_lezione  = '" + body.inizio_lezione +"' "
+
+              conn.query(query2, (err, rows, fields) => {
+                if (err) {
+                    res.json({ ok: 'false', debug: err })
+                } else {
+                    res.json({ ok: 'true' })
+                }
+            })
             }
 
         })
