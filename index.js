@@ -159,7 +159,6 @@ app.post('/prenota', (req, res) => {
 
     try {
         conn.query(query, (err, rows, fields) => {
-            //TODO: query modifica calendario_settimana
             //if (err) throw err
             if (err) {
                 res.json({ ok: 'false', debug: err })
