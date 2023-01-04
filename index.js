@@ -85,7 +85,7 @@ app.get('/get-lezioni/:id_studente',(req,res) => {
                             let inizioLezione = moment(rows[i].inizio_lezione).utcOffset(60).format('DD/MM/YYYY, hh:mm A') 
                             let fineLezione = moment(rows[i].fine_lezione).utcOffset(60).format('DD/MM/YYYY, hh:mm A')
 
-                            result.push({ id_lezione: rows[i].id_lezione, id_insegnante: rows[i].id_insegnante, insegnante: rows[i].insegnante, materia: rows[i].materia, id_studente: rows[i].id_studente, username: rows[i].username, inizio_lezione: inizioLezione, fine_lezione: fineLezione, stato: rows[i].stato})
+                            result.push({ id_lezione: rows[i].id_lezione, id_insegnante: rows[i].id_insegnante, insegnante: rows[i].insegnante, materia: rows[i].materia, id_studente: rows[i].id_studente, username: rows[i].username, inizio_lezione: inizioLezione, fine_lezione: fineLezione, stato: rows[i].stato, cod_lezione: rows[i].cod_lezione })
                         }
                        // console.log(result)
                         res.json({isTable:'true', data:result })
@@ -108,8 +108,12 @@ app.get('/get-lezioni/:id_studente',(req,res) => {
 
 app.get('/lezione/:materia',(req,res) => {
 
+    var today = new Date()
+    var id_today = today.getDay()
+    //TODO: filtro orario
+
     try{
-        conn.query('SELECT cs.cod_lezione, cs.id_giorno, cs.id_insegnante, im.insegnante, cs.materia, cs.inizio_lezione, cs.fine_lezione, cs.stato FROM calendario_settimana cs JOIN insegnante_materia im ON (im.id_insegnante = cs.id_insegnante) WHERE cs.materia = "' + req.params.materia + '" AND cs.stato =  "0"', (err, rows, fields) => {
+        conn.query('SELECT cs.cod_lezione, cs.id_giorno, cs.id_insegnante, im.insegnante, cs.materia, cs.inizio_lezione, cs.fine_lezione, cs.stato FROM calendario_settimana cs JOIN insegnante_materia im ON (im.id_insegnante = cs.id_insegnante) WHERE cs.materia = "' + req.params.materia + '" AND cs.stato =  "0" AND cs.id_giorno >= ' + id_today, (err, rows, fields) => {
             //if (err) throw err
             if (err){
                 res.json({ isTable: 'false' })
@@ -176,9 +180,11 @@ app.post('/prenota', (req, res) => {
 
 })
 
-app.get('/operazione/:id_lezione-cod_lezione/:tipologia', (req, res) => {
+app.get('/operazione/:id_lezione_cod_lezione/:tipologia', (req, res) => {
+    
 //console.log("effettuata " + req.params.id_lezione)
-var array_split = req.params.id_lezione-cod_lezione.split("-")
+var array_split = req.params.id_lezione_cod_lezione.split("+")
+    console.log(array_split)
 var id_lezione = array_split[0] 
 var cod_lezione = array_split[1]
 
