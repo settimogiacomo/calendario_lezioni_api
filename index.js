@@ -67,7 +67,7 @@ app.get('/get-lezioni/:id_studente',(req,res) => {
     var body = req.body
 
     try{
-        conn.query('SELECT * FROM lista_lezioni_vista WHERE id_studente = "' + req.params.id_studente + '"', (err, rows, fields) => {
+        conn.query('SELECT * FROM lista_lezioni_vista WHERE id_studente = "' + req.params.id_studente + '" ORDER BY id_lezione DESC', (err, rows, fields) => {
             
             //if (err) throw err
             if (err){
@@ -176,22 +176,34 @@ app.post('/prenota', (req, res) => {
 
 })
 
-app.get('/effettuata/:id_lezione', (req, res) => {
-console.log("effettuataa " + req.params.id_lezione)
+app.get('/operazione/:id_lezione-cod_lezione/:tipologia', (req, res) => {
+//console.log("effettuata " + req.params.id_lezione)
+var array_split = req.params.id_lezione-cod_lezione.split("-")
+var id_lezione = array_split[0] 
+var cod_lezione = array_split[1]
+
+
     try {
-        conn.query('UPDATE lista_lezioni SET stato = 2 WHERE id_lezione = ' + req.params.id_lezione, (err, rows, fields) => {
+        conn.query('UPDATE lista_lezioni SET stato = '+ req.params.tipologia +' WHERE id_lezione = ' + id_lezione, (err, rows, fields) => {
             //if (err) throw err
             if (err) {
                 res.json({ ok: 'false' })
             } else {
 
-                var query2 = "UPDATE calendario_settimana SET stato = 2 WHERE id_lezione = " + req.params.id_lezione
+                var query2 = 'UPDATE calendario_settimana SET stato = '+ req.params.tipologia +' WHERE cod_lezione = ' + cod_lezione
 
                 conn.query(query2, (err, rows, fields) => {
                     if (err) {
                         res.json({ ok: 'false', debug: err })
                     } else {
-                        res.json({ ok: 'true' })
+                        if (req.params.tipologia == 2) {
+                            var stringa = "effettuata"
+                        }
+                        else if(req.params.tipologia == 3) {
+                           var stringa = "disdetta"
+                        }
+''
+                        res.json({ ok: 'true', stato: stringa })
                     }
 
                 })
