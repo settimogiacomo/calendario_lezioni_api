@@ -18,6 +18,7 @@ const conn = mysql.createConnection({
 
 
 conn.connect()
+
 app.use(cors({
     origin: '*' //'http://localhost' indirizzo flutter
 }));
@@ -25,10 +26,6 @@ app.use(cors({
 //the encoding of the request (post) Contet-Type: application/json
 app.use(bodyParser.json())
 
-app.get('/',(req,res) => {
-    console.log("prova in json")
-    res.json({messaggio:'ciao'});
-})
 
 app.post('/check-login',(req,res) => {
     var body = req.body
@@ -101,7 +98,7 @@ app.get('/get-lezioni/:id_studente',(req,res) => {
         res.json ({isTable:'false', debug:errore})
     }
     
- //   console.log("GET get-lezioni")
+    console.log("GET get-lezioni")
     res.status(200);
     
 })
@@ -125,7 +122,6 @@ app.get('/lezione/:materia',(req,res) => {
 
                             result.push({ cod_lezione: rows[i].cod_lezione, id_giorno: rows[i].id_giorno, id_insegnante: rows[i].id_insegnante, insegnante: rows[i].insegnante, materia: rows[i].materia, inizio_lezione: rows[i].inizio_lezione, fine_lezione: rows[i].fine_lezione, stato: rows[i].stato})
                         }
-                        console.log(result)
                         res.json({isTable:'true', data:result })
                         
                 } else {
@@ -138,6 +134,8 @@ app.get('/lezione/:materia',(req,res) => {
     } catch(errore) {
         res.json ({isTable:'false', debug:errore})
     }
+
+    console.log("GET lezione")
     
    
     
@@ -176,15 +174,14 @@ app.post('/prenota', (req, res) => {
     } catch (errore) {
         res.json({ ok: 'false', debug: errore })
     } 
+    console.log("GET prenota")
 
 
 })
 
 app.get('/operazione/:id_lezione_cod_lezione/:tipologia', (req, res) => {
     
-//console.log("effettuata " + req.params.id_lezione)
 var array_split = req.params.id_lezione_cod_lezione.split("+")
-    console.log(array_split)
 var id_lezione = array_split[0] 
 var cod_lezione = array_split[1]
 
@@ -220,6 +217,7 @@ var cod_lezione = array_split[1]
     } catch (errore) {
         res.json({ ok: 'false', debug: errore })
     }
+    console.log("GET operazione")
 
 })
 
