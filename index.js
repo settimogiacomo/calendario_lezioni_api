@@ -107,10 +107,15 @@ app.get('/lezione/:materia',(req,res) => {
 
     var today = new Date()
     var id_today = today.getDay()
-    //TODO: filtro orario
+    var ora = today.getHours()
+    var ora_inizio = ""
+    if (today.getDay() !== 6 && today.getDay() !== 0){
+        ora_inizio =" AND cs.inizio_lezione >= '" + ora + ":00'"
+    }
+
 
     try{
-        conn.query('SELECT cs.cod_lezione, cs.id_giorno, cs.id_insegnante, im.insegnante, cs.materia, cs.inizio_lezione, cs.fine_lezione, cs.stato FROM calendario_settimana cs JOIN insegnante_materia im ON (im.id_insegnante = cs.id_insegnante) WHERE cs.materia = "' + req.params.materia + '" AND cs.stato =  "0" AND cs.id_giorno >= ' + id_today, (err, rows, fields) => {
+        conn.query('SELECT cs.cod_lezione, cs.id_giorno, cs.id_insegnante, im.insegnante, cs.materia, cs.inizio_lezione, cs.fine_lezione, cs.stato FROM calendario_settimana cs JOIN insegnante_materia im ON (im.id_insegnante = cs.id_insegnante) WHERE cs.materia = "' + req.params.materia + '" AND cs.stato =  "0" AND cs.id_giorno >= ' + id_today + ora_inizio, (err, rows, fields) => {
             //if (err) throw err
             if (err){
                 res.json({ isTable: 'false' })
@@ -144,9 +149,12 @@ app.get('/lezione/:materia',(req,res) => {
 app.post('/prenota', (req, res) => {
     var body = req.body
 
+    console.log("body:" +  body)
     let day = getGiornoLezione(body.id_giorno)
+    console.log("day:" + day)
     moment.locale('it')
     var giorno = moment(day).utcOffset(60).format('YYYY-MM-DD') 
+    console.log("goorno:" +  giorno)
 
     var query = "INSERT INTO lista_lezioni (id_insegnante, id_studente, inizio_lezione, fine_lezione, stato, cod_lezione) VALUES ('" + body.id_insegnante + "', '" + body.id_studente + "', '" + giorno + " " + body.inizio_lezione + "', '" + giorno + " " + body.fine_lezione + "', '1', '" + body.cod_lezione + "')"
   
@@ -205,7 +213,6 @@ var cod_lezione = array_split[1]
                         else if(req.params.tipologia == 3) {
                            var stringa = "disdetta"
                         }
-''
                         res.json({ ok: 'true', stato: stringa })
                     }
 
@@ -221,6 +228,47 @@ var cod_lezione = array_split[1]
 
 })
 
+app.get('/DettagliLezione/:idlezione',(req,res) => {
+    
+    try{
+        conn.query('SELECT * from lista_lezioni_vista WHERE id_lezione = "' + req.params.idlezione + '"', (err, rows, fields) => {
+            //if (err) throw err
+            if (err){
+                res.json({ ok: 'false' })
+            } else {
+               
+                if(rows.length >= 1){
+                    var result = [];
+                        for (let i=0;i<rows.length;i++) {
+                            moment.locale('it')
+                            var data_inizio_lezione = moment(rows[i].inizio_lezione).utcOffset(60).format('YYYY-MM-DD HH:mm') //rendere la data leggibile
+                            var data_fine_lezione = moment(rows[i].fine_lezione).utcOffset(60).format('YYYY-MM-DD HH:mm')
+                            var data_orario_inserimento = moment(rows[i].orario_inserimento).utcOffset(60).format('YYYY-MM-DD HH:mm')
+
+
+                            result.push({ id_lezione: rows[i].id_lezione, id_insegnante: rows[i].id_insegnante, insegnante: rows[i].insegnante, materia: rows[i].materia, inizio_lezione: data_inizio_lezione, fine_lezione: data_fine_lezione, stato: rows[i].stato, cod_lezione : rows[i].cod_lezione, orario_inserimento: data_orario_inserimento})
+                        }
+                        res.json({ok:'true', data:result })
+                        
+                } else {
+                    res.json({ ok: 'false' })
+                }
+                
+            }
+            
+        })
+    } catch(errore) {
+        res.json ({ok:'false', debug:errore})
+    }
+
+    console.log("GET DettagliLezione")
+    
+
+
+
+
+})
+
 
 
 app.listen(port, () => console.log('Server in ascolto'));
@@ -228,10 +276,10 @@ app.listen(port, () => console.log('Server in ascolto'));
 //TODO: spostare 
 function getGiornoLezione(giornoDellaLezione){
     var today = new Date()
-    if (today.getDay() == 5 || today.getDay() == 6 || today.getDay() == 0){
+    if (today.getDay() == 5 || today.getDay() == 6){
         today.setDate(today.getDate() + 7);
     }
-    var domenica = today.getDate() - today.getDay()
+    var domenica = today.getDate() - today.getDay() //date = il numero del giorno del mese. day = numero del giorno della settimana
     let giornoLezione = domenica + giornoDellaLezione
     let dataLezione = new Date(today.setDate(giornoLezione))
     return dataLezione
