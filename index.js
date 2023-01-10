@@ -109,13 +109,15 @@ app.get('/lezione/:materia',(req,res) => {
     var id_today = today.getDay()
     var ora = today.getHours()
     var ora_inizio = ""
-    if (today.getDay() !== 6 && today.getDay() !== 0){
+    if (today.getDay() !== 6 && today.getDay() !== 0 && today.getHours() <= 18){
         ora_inizio =" AND cs.inizio_lezione >= '" + ora + ":00'"
     }
 
 
     try{
-        conn.query('SELECT cs.cod_lezione, cs.id_giorno, cs.id_insegnante, im.insegnante, cs.materia, cs.inizio_lezione, cs.fine_lezione, cs.stato FROM calendario_settimana cs JOIN insegnante_materia im ON (im.id_insegnante = cs.id_insegnante) WHERE cs.materia = "' + req.params.materia + '" AND cs.stato =  "0" AND cs.id_giorno >= ' + id_today + ora_inizio, (err, rows, fields) => {
+        conn.query('SELECT cs.cod_lezione, cs.id_giorno, cs.id_insegnante, im.insegnante, cs.materia, cs.inizio_lezione, cs.fine_lezione, cs.stato FROM calendario_settimana cs JOIN insegnante_materia im ON (im.id_insegnante = cs.id_insegnante) WHERE cs.materia = "' + req.params.materia + '" AND cs.stato =  "0" '
+            + 'AND cs.id_giorno >= ' + id_today + ora_inizio, //filtro giorno e ora
+        (err, rows, fields) => {
             //if (err) throw err
             if (err){
                 res.json({ isTable: 'false' })
