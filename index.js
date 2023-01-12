@@ -109,9 +109,9 @@ app.get('/lezione/:materia',(req,res) => {
     var id_today = today.getDay()
     var ora = today.getHours()
     var ora_inizio = ""
-    if (today.getDay() !== 6 && today.getDay() !== 0 && today.getHours() <= 18){
-        ora_inizio =" AND cs.inizio_lezione >= '" + ora + ":00'"
-    }
+    // if (today.getDay() !== 6 && today.getDay() !== 0 && today.getHours() <= 18){
+    //     ora_inizio =" AND cs.inizio_lezione >= '" + ora + ":00'"
+    // }
 
 
     try{
